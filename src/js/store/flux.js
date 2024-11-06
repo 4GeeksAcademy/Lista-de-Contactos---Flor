@@ -12,7 +12,8 @@ const getState = ({ getStore, getActions, setStore }) => {
 					background: "white",
 					initial: "white"
 				}
-			]
+			],
+			contacts:[],
 		},
 		actions: {
 			// Use getActions to call a function within a fuction
@@ -37,6 +38,25 @@ const getState = ({ getStore, getActions, setStore }) => {
 
 				//reset the global store
 				setStore({ demo: demo });
+			},
+
+			getContact: async () => {
+				const resp = await fetch(process.env.BACKEND_URL + "agendas/fmaya");
+				const data = await resp.json();
+				console.log(data);
+				setStore({ contacts: data.contacts })
+			},
+			createContact: async (newContact) => {
+				const myHeaders = new Headers();
+				myHeaders.append("Content-Type", "application/json");
+				const resp = await fetch(process.env.BACKEND_URL + "agendas/fmaya/contacts", {
+					method: 'POST',
+					headers: myHeaders,
+					body: JSON.stringify(newContact),
+				});
+				if (resp.ok) {
+					await getActions().getContacts()
+				}
 			}
 		}
 	};
