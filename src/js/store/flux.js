@@ -41,11 +41,38 @@ const getState = ({ getStore, getActions, setStore }) => {
 			},
 
 			getContact: async () => {
+				try {
 				const resp = await fetch(process.env.BACKEND_URL + "agendas/fmaya");
+				if (resp.status == 404) {
+					getActions().createAgenda()
+					return
+				}
 				const data = await resp.json();
 				console.log(data);
 				setStore({ contacts: data.contacts })
+				return true
+				} catch (error) {
+					console.log(error)
+					return false
+				}
 			},
+			createAgenda: async () => {
+				try {
+					const resp = await fetch("https://playground.4geeks.com/contact/agendas/fmaya", {
+						method: "POST",
+						headers: { "Content-Type": "application/json" }
+					})
+					console.log(resp)
+					if (resp.status == 201) {
+						getActions().getContact()
+						return true
+					}
+				} catch (error) {
+					console.log(error)
+					return false
+				}
+			},
+
 			createContact: async (newContact) => {
 				const myHeaders = new Headers();
 				myHeaders.append("Content-Type", "application/json");
@@ -55,8 +82,24 @@ const getState = ({ getStore, getActions, setStore }) => {
 					body: JSON.stringify(newContact),
 				});
 				if (resp.ok) {
-					await getActions().getContacts()
+					await getActions().getContact()
 				}
+			},
+			deleteContact: async (id) => {
+				try {
+					const resp = await fetch(process.env.BACKEND_URL + "agendas/fmaya/contacts/" + id, {
+						method: 'DELETE',
+						headers: {"Content-Type": "application/json"},
+					});
+					if (resp.ok) {
+						await getActions().getContact()
+					}
+				} catch (error) {
+					console.log(error)
+					return false
+				}
+				
+				
 			}
 		}
 	};
