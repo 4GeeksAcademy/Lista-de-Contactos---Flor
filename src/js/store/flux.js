@@ -56,6 +56,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 					return false
 				}
 			},
+			
 			createAgenda: async () => {
 				try {
 					const resp = await fetch("https://playground.4geeks.com/contact/agendas/fmaya", {
@@ -85,6 +86,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 					await getActions().getContact()
 				}
 			},
+
 			deleteContact: async (id) => {
 				try {
 					const resp = await fetch(process.env.BACKEND_URL + "agendas/fmaya/contacts/" + id, {
@@ -98,9 +100,20 @@ const getState = ({ getStore, getActions, setStore }) => {
 					console.log(error)
 					return false
 				}
-				
-				
-			}
+			},
+
+			editContact: async (newContact, id) => {
+				const myHeaders = new Headers();
+				myHeaders.append("Content-Type", "application/json");
+				const resp = await fetch(process.env.BACKEND_URL + "agendas/fmaya/contacts/" + id, {
+					method: 'PUT',
+					headers: myHeaders,
+					body: JSON.stringify(newContact),
+				});
+				if (resp.ok) {
+					await getActions().getContact()
+				}
+			},
 		}
 	};
 };
